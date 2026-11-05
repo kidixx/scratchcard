@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const departments = [
   "Computer Science",
@@ -29,12 +30,13 @@ export default function SignupPage() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function update(key: string, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (Object.values(form).some((v) => !v.trim())) {
       setError("Please fill in every field.");
@@ -44,8 +46,32 @@ export default function SignupPage() {
       setError("Password must be at least 6 characters.");
       return;
     }
+    setLoading(true);
     setError("");
-    // TODO: replace with real signup call
+
+    const { data, error } = await supabase.auth.signUp({
+      email: form.email.trim(),
+      password: form.password,
+      options: {
+        data: {
+          full_name: form.name.trim(),
+          matric: form.matric.trim(),
+          department: form.department,
+          level: form.level,
+          phone: form.phone.trim(),
+        },
+      },
+    });
+
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    if (!data.session) {
+      setError("Account created. Check your email to confirm, then log in.");
+      return;
+    }
     router.push("/home");
   }
 
@@ -123,9 +149,10 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white active:scale-[0.98] hover:bg-indigo-700"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
           >
-            Sign up
+            {loading ? "Creating account..." : "Sign up"}
           </button>
         </form>
 
