@@ -64,8 +64,13 @@ export default function SignupPage() {
     });
 
     setLoading(false);
+
     if (error) {
-      setError(error.message);
+      setError(
+        error.message.includes("Database error")
+          ? "That matric number or email is already registered. Try logging in."
+          : error.message
+      );
       return;
     }
     if (!data.session) {
