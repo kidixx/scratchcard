@@ -3,22 +3,33 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [matric, setMatric] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!matric.trim() || !password) {
-      setError("Enter your matric number and password.");
+    if (!email.trim() || !password) {
+      setError("Enter your email and password.");
       return;
     }
+    setLoading(true);
     setError("");
-    // TODO: replace with real auth call
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
     router.push("/home");
   }
 
@@ -38,12 +49,13 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">
-              Matric number
+              Email
             </label>
             <input
-              value={matric}
-              onChange={(e) => setMatric(e.target.value)}
-              placeholder="e.g. 20/1234"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
               className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
             />
           </div>
@@ -74,9 +86,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white active:scale-[0.98] hover:bg-indigo-700"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
           >
-            Log in
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
 
