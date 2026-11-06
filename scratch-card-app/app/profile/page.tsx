@@ -5,18 +5,10 @@ import { useRouter } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import { supabase } from "@/lib/supabase";
 
-type Profile = {
-  full_name: string;
-  matric: string;
-  department: string | null;
-  level: string | null;
-  phone: string | null;
-};
-
 export default function ProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,11 +23,11 @@ export default function ProfilePage() {
 
       const { data: row } = await supabase
         .from("profiles")
-        .select("full_name, matric, department, level, phone")
+        .select("phone")
         .eq("id", user.id)
         .single();
 
-      setProfile(row);
+      setPhone(row?.phone ?? "");
       setLoading(false);
     }
     load();
@@ -56,11 +48,8 @@ export default function ProfilePage() {
   }
 
   const rows = [
-    { label: "Matric number", value: profile?.matric },
-    { label: "Department", value: profile?.department },
-    { label: "Level", value: profile?.level ? `${profile.level} Level` : "" },
     { label: "Email", value: email },
-    { label: "Phone", value: profile?.phone },
+    { label: "Phone", value: phone },
   ];
 
   return (
@@ -68,11 +57,9 @@ export default function ProfilePage() {
       <div className="mx-auto w-full max-w-sm">
         <div className="text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100 text-3xl font-bold text-indigo-600">
-            {profile?.full_name?.charAt(0).toUpperCase() ?? "?"}
+            {email.charAt(0).toUpperCase() || "?"}
           </div>
-          <h1 className="mt-3 text-xl font-bold text-slate-900">
-            {profile?.full_name ?? "Student"}
-          </h1>
+          <h1 className="mt-3 text-xl font-bold text-slate-900">My account</h1>
         </div>
 
         <div className="mt-8 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">

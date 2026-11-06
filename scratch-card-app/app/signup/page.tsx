@@ -5,30 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-const departments = [
-  "Computer Science",
-  "Electrical Engineering",
-  "Mechanical Engineering",
-  "Accounting",
-  "Mass Communication",
-  "Other",
-];
-const levels = ["100", "200", "300", "400", "500"];
-
 const inputClass =
   "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    matric: "",
-    department: "",
-    level: "",
-    email: "",
-    phone: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", phone: "", password: "" });
+  const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -52,25 +35,13 @@ export default function SignupPage() {
     const { data, error } = await supabase.auth.signUp({
       email: form.email.trim(),
       password: form.password,
-      options: {
-        data: {
-          full_name: form.name.trim(),
-          matric: form.matric.trim(),
-          department: form.department,
-          level: form.level,
-          phone: form.phone.trim(),
-        },
-      },
+      options: { data: { phone: form.phone.trim() } },
     });
 
     setLoading(false);
 
     if (error) {
-      setError(
-        error.message.includes("Database error")
-          ? "That matric number or email is already registered. Try logging in."
-          : error.message
-      );
+      setError(error.message);
       return;
     }
     if (!data.session) {
@@ -81,53 +52,16 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-10">
+    <main className="min-h-screen bg-slate-50 flex flex-col justify-center px-6 py-10">
       <div className="mx-auto w-full max-w-sm">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-900">Create account</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Fill in your student details to get started
+            Sign up to buy your course registration card
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            className={inputClass}
-            placeholder="Full name"
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-          />
-          <input
-            className={inputClass}
-            placeholder="Matric number"
-            value={form.matric}
-            onChange={(e) => update("matric", e.target.value)}
-          />
-
-          <select
-            className={inputClass}
-            value={form.department}
-            onChange={(e) => update("department", e.target.value)}
-          >
-            <option value="">Select department</option>
-            {departments.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
-
-          <select
-            className={inputClass}
-            value={form.level}
-            onChange={(e) => update("level", e.target.value)}
-          >
-            <option value="">Select level</option>
-            {levels.map((l) => (
-              <option key={l} value={l}>
-                {l} Level
-              </option>
-            ))}
-          </select>
-
           <input
             type="email"
             className={inputClass}
@@ -142,13 +76,22 @@ export default function SignupPage() {
             value={form.phone}
             onChange={(e) => update("phone", e.target.value)}
           />
-          <input
-            type="password"
-            className={inputClass}
-            placeholder="Password"
-            value={form.password}
-            onChange={(e) => update("password", e.target.value)}
-          />
+          <div className="relative">
+            <input
+              type={show ? "text" : "password"}
+              className={`${inputClass} pr-16`}
+              placeholder="Password"
+              value={form.password}
+              onChange={(e) => update("password", e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShow(!show)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-indigo-600"
+            >
+              {show ? "Hide" : "Show"}
+            </button>
+          </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
