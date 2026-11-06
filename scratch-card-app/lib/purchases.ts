@@ -11,7 +11,7 @@ export type Purchase = {
 
 type BuyRow = {
   out_purchase_id: string;
-  out_pin: string;
+  out_pin: string | null;
   out_serial: string;
   out_amount: number;
   out_card_name: string;
@@ -23,7 +23,7 @@ type PurchaseRow = {
   amount: number;
   created_at: string;
   cards: {
-    pin: string;
+    pin: string | null;
     serial: string;
     card_types: { name: string } | null;
   } | null;
@@ -44,7 +44,7 @@ export async function buyCard(cardTypeId: string): Promise<Purchase> {
     id: r.out_purchase_id,
     cardName: r.out_card_name,
     price: r.out_amount,
-    pin: r.out_pin,
+    pin: r.out_pin ?? "",
     serial: r.out_serial,
     date: r.out_date,
   };
@@ -63,7 +63,7 @@ export async function getPurchases(): Promise<Purchase[]> {
     id: p.id,
     cardName: p.cards?.card_types?.name ?? "Card",
     price: p.amount,
-    pin: r.out_pin ?? "",
+    pin: p.cards?.pin ?? "",
     serial: p.cards?.serial ?? "",
     date: p.created_at,
   }));
