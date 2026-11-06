@@ -9,10 +9,16 @@ import { formatNaira } from "@/lib/cards";
 function SuccessContent() {
   const params = useSearchParams();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState("");
 
   useEffect(() => {
-    setPurchase(getPurchases().find((p) => p.id === params.get("id")) ?? null);
+    async function load() {
+      const all = await getPurchases();
+      setPurchase(all.find((p) => p.id === params.get("id")) ?? null);
+      setLoading(false);
+    }
+    load();
   }, [params]);
 
   function copy(label: string, text: string) {
@@ -21,9 +27,28 @@ function SuccessContent() {
     setTimeout(() => setCopied(""), 1500);
   }
 
-  if (!purchase) {
+  if (loading) {
     return <p className="text-center text-slate-500">Loading...</p>;
   }
+
+  if (!purchase) {
+    return (
+      <div className="text-center">
+        <p className="text-slate-600">We couldn't find that purchase.</p>
+        <Link
+          href="/my-cards"
+          className="mt-3 inline-block font-semibold text-indigo-600"
+        >
+          Go to My Cards
+        </Link>
+      </div>
+    );
+  }
+
+  const fields = [
+    { label: "PIN", value: purchase.pin },
+    { label: "Serial number", value: purchase.serial },
+  ].filter((f) => f.value);
 
   return (
     <>
@@ -38,10 +63,7 @@ function SuccessContent() {
       </div>
 
       <div className="mt-8 space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
-        {[
-          { label: "PIN", value: purchase.pin },
-          { label: "Serial number", value: purchase.serial },
-        ].map((f) => (
+        {fields.map((f) => (
           <div key={f.label}>
             <p className="text-xs uppercase tracking-wide text-slate-400">
               {f.label}

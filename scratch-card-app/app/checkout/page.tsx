@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cardTypes, formatNaira } from "@/lib/cards";
-import { createPurchase, savePurchase } from "@/lib/purchases";
+import { buyCard } from "@/lib/purchases";
 
 const methods = [
   { id: "card", label: "Debit card", icon: "💳" },
@@ -18,6 +18,7 @@ function CheckoutContent() {
   const card = cardTypes.find((c) => c.id === params.get("card"));
   const [method, setMethod] = useState("card");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   if (!card) {
     return (
@@ -30,15 +31,23 @@ function CheckoutContent() {
     );
   }
 
-  function pay() {
+  async function pay() {
     if (!card) return;
     setLoading(true);
-    // TODO: replace with real payment gateway
-    setTimeout(() => {
-      const purchase = createPurchase(card);
-      savePurchase(purchase);
+    setError("");
+    try {
+      // TODO: Paystack payment goes here, before buyCard
+      const purchase = await buyCard(card.id);
       router.push(`/success?id=${purchase.id}`);
-    }, 1500);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Something went wrong.";
+      if (message.includes("Not logged in")) {
+        router.push("/login");
+        return;
+      }
+      setError(message);
+      setLoading(false);
+    }
   }
 
   return (
@@ -77,10 +86,12 @@ function CheckoutContent() {
         ))}
       </div>
 
+      {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+
       <button
         onClick={pay}
         disabled={loading}
-        className="mt-8 w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+        className="mt-6 w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
       >
         {loading ? "Processing..." : `Pay ${formatNaira(card.price)}`}
       </button>

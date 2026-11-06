@@ -8,11 +8,15 @@ import { getPurchases, type Purchase } from "@/lib/purchases";
 
 export default function MyCardsPage() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
   const [copied, setCopied] = useState("");
 
   useEffect(() => {
-    setPurchases(getPurchases());
+    getPurchases().then((list) => {
+      setPurchases(list);
+      setLoading(false);
+    });
   }, []);
 
   function copy(key: string, text: string) {
@@ -26,13 +30,17 @@ export default function MyCardsPage() {
       <div className="mx-auto w-full max-w-sm">
         <h1 className="text-2xl font-bold text-slate-900">My cards</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Tap a card to view its PIN
+          Tap a card to view its details
         </p>
 
-        {purchases.length === 0 ? (
+        {loading ? (
+          <p className="mt-16 text-center text-slate-500">Loading...</p>
+        ) : purchases.length === 0 ? (
           <div className="mt-16 text-center">
             <p className="text-4xl">🎫</p>
-            <p className="mt-3 text-slate-600">You haven't bought any card yet.</p>
+            <p className="mt-3 text-slate-600">
+              You haven't bought any card yet.
+            </p>
             <Link
               href="/home"
               className="mt-4 inline-block font-semibold text-indigo-600"
@@ -44,6 +52,11 @@ export default function MyCardsPage() {
           <div className="mt-6 space-y-4">
             {purchases.map((p) => {
               const open = openId === p.id;
+              const fields = [
+                { label: "PIN", value: p.pin },
+                { label: "Serial number", value: p.serial },
+              ].filter((f) => f.value);
+
               return (
                 <div
                   key={p.id}
@@ -72,10 +85,7 @@ export default function MyCardsPage() {
 
                   {open && (
                     <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
-                      {[
-                        { label: "PIN", value: p.pin },
-                        { label: "Serial number", value: p.serial },
-                      ].map((f) => (
+                      {fields.map((f) => (
                         <div key={f.label}>
                           <p className="text-xs uppercase tracking-wide text-slate-400">
                             {f.label}

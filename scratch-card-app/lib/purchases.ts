@@ -1,4 +1,4 @@
-import type { CardType } from "./cards";
+import { supabase } from "./supabase";
 
 export type Purchase = {
   id: string;
@@ -9,32 +9,62 @@ export type Purchase = {
   date: string;
 };
 
-const KEY = "purchases";
+type BuyRow = {
+  out_purchase_id: string;
+  out_pin: string;
+  out_serial: string;
+  out_amount: number;
+  out_card_name: string;
+  out_date: string;
+};
 
-const digits = (n: number) =>
-  Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join("");
+type PurchaseRow = {
+  id: string;
+  amount: number;
+  created_at: string;
+  cards: {
+    pin: string;
+    serial: string;
+    card_types: { name: string } | null;
+  } | null;
+};
 
-// TODO: replace with real PIN from the backend
-export function createPurchase(card: CardType): Purchase {
+export async function buyCard(cardTypeId: string): Promise<Purchase> {
+  const { data, error } = await supabase.rpc("buy_card", {
+    p_card_type: cardTypeId,
+  });
+  if (error) {
+    if (error.message.includes("Out of stock")) {
+      throw new Error("Cards are out of stock right now. Please try again later.");
+    }
+    throw new Error(error.message);
+  }
+  const r = (data as BuyRow[])[0];
   return {
-    id: crypto.randomUUID(),
-    cardName: card.name,
-    price: card.price,
-    pin: `${digits(4)}-${digits(4)}-${digits(4)}-${digits(4)}`,
-    serial: `SN${digits(10)}`,
-    date: new Date().toISOString(),
+    id: r.out_purchase_id,
+    cardName: r.out_card_name,
+    price: r.out_amount,
+    pin: r.out_pin,
+    serial: r.out_serial,
+    date: r.out_date,
   };
 }
 
-export function getPurchases(): Purchase[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
+export async function getPurchases(): Promise<Purchase[]> {
+  const { data, error } = await supabase
+    .from("purchases")
+    .select("id, amount, created_at, cards(pin, serial, card_types(name))")
+    .eq("status", "paid")
+    .order("created_at", { ascending: false });
 
-export function savePurchase(p: Purchase) {
-  localStorage.setItem(KEY, JSON.stringify([p, ...getPurchases()]));
+  if (error || !data) return [];
+
+  return (data as unknown as PurchaseRow[]).map((p) => ({
+    id: p.id,
+    cardName: p.cards?.card_types?.name ?? "Card",
+    price: p.amount,
+    pin: r.out_pin ?? "",
+    serial: p.cards?.serial ?? "",
+    date: p.created_at,
+  }));
 }
