@@ -1,16 +1,18 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import SchoolBrand from "@/components/SchoolBrand";
 import { cardTypes, formatNaira } from "@/lib/cards";
-import { school } from "@/lib/school";
 
 export default function HomePage() {
   const card = cardTypes[0];
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 pb-28 pt-10">
+    <main className="min-h-screen bg-slate-50 px-6 pb-28 pt-8">
       <div className="mx-auto w-full max-w-sm">
-        <p className="text-sm font-semibold text-green-700">{school.short}</p>
-        <h1 className="text-2xl font-bold text-slate-900">Buy your card</h1>
+        <SchoolBrand />
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">
+          Buy your card
+        </h1>
 
         <div className="mt-6 rounded-2xl bg-green-600 p-6 text-white">
           <p className="text-sm opacity-80">{card.name}</p>
