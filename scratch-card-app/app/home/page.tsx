@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 pb-28 pt-8">
       <div className="mx-auto w-full max-w-sm">
-        <SchoolBrand />
+        <SchoolBrand align="left" />
         <h1 className="mt-2 text-2xl font-bold text-slate-900">
           Buy your card
         </h1>
