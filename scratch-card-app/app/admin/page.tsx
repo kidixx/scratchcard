@@ -86,7 +86,7 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="mx-auto w-full max-w-sm">
-        <Link href="/home" className="text-sm font-medium text-indigo-600">
+        <Link href="/home" className="text-sm font-medium text-green-700">
           ← Back to app
         </Link>
         <h1 className="mt-3 text-2xl font-bold text-slate-900">Admin</h1>
@@ -105,7 +105,7 @@ export default function AdminPage() {
             <p className="text-xs uppercase tracking-wide text-slate-400">
               Sold
             </p>
-            <p className="mt-1 text-2xl font-bold text-indigo-600">
+            <p className="mt-1 text-2xl font-bold text-slate-700">
               {stock.out_sold}
             </p>
           </div>
@@ -124,17 +124,17 @@ export default function AdminPage() {
           onChange={(e) => setText(e.target.value)}
           rows={10}
           placeholder={"SN0001\nSN0002\nSN0003,481920"}
-          className="w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+          className="w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-sm text-slate-900 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-200"
         />
         <p className="mt-1 text-xs text-slate-400">{lines} line(s) pasted</p>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-        {message && <p className="mt-3 text-sm text-green-600">{message}</p>}
+        {message && <p className="mt-3 text-sm text-green-700">{message}</p>}
 
         <button
           onClick={upload}
           disabled={busy}
-          className="mt-4 w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+          className="mt-4 w-full rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-60"
         >
           {busy ? "Uploading..." : "Upload cards"}
         </button>

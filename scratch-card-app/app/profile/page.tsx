@@ -56,7 +56,7 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-slate-50 px-6 pb-28 pt-10">
       <div className="mx-auto w-full max-w-sm">
         <div className="text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100 text-3xl font-bold text-indigo-600">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-3xl font-bold text-green-600">
             {email.charAt(0).toUpperCase() || "?"}
           </div>
           <h1 className="mt-3 text-xl font-bold text-slate-900">My account</h1>

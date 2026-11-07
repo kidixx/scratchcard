@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@theme {
+  --color-green-600: #1a8f2b;
+  --color-green-700: #137324;
+}

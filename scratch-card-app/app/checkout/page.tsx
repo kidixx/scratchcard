@@ -4,19 +4,12 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cardTypes, formatNaira } from "@/lib/cards";
-import { buyCard } from "@/lib/purchases";
-
-const methods = [
-  { id: "card", label: "Debit card", icon: "💳" },
-  { id: "transfer", label: "Bank transfer", icon: "🏦" },
-  { id: "ussd", label: "USSD", icon: "📱" },
-];
+import { supabase } from "@/lib/supabase";
 
 function CheckoutContent() {
   const router = useRouter();
   const params = useSearchParams();
   const card = cardTypes.find((c) => c.id === params.get("card"));
-  const [method, setMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,7 +17,7 @@ function CheckoutContent() {
     return (
       <div className="text-center">
         <p className="text-slate-600">No card selected.</p>
-        <Link href="/home" className="mt-3 inline-block font-semibold text-indigo-600">
+        <Link href="/home" className="mt-3 inline-block font-semibold text-green-700">
           Back to home
         </Link>
       </div>
@@ -35,24 +28,37 @@ function CheckoutContent() {
     if (!card) return;
     setLoading(true);
     setError("");
+
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
     try {
-      // TODO: Paystack payment goes here, before buyCard
-      const purchase = await buyCard(card.id);
-      router.push(`/success?id=${purchase.id}`);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Something went wrong.";
-      if (message.includes("Not logged in")) {
-        router.push("/login");
-        return;
+      const res = await fetch("/api/paystack/initialize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cardTypeId: card.id }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Could not start payment.");
       }
-      setError(message);
+      window.location.href = json.url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
       setLoading(false);
     }
   }
 
   return (
     <>
-      <Link href="/home" className="text-sm font-medium text-indigo-600">
+      <Link href="/home" className="text-sm font-medium text-green-700">
         ← Back
       </Link>
       <h1 className="mt-3 text-2xl font-bold text-slate-900">Checkout</h1>
@@ -62,38 +68,25 @@ function CheckoutContent() {
         <h2 className="mt-1 font-semibold text-slate-900">{card.name}</h2>
         <div className="mt-4 flex justify-between border-t border-slate-100 pt-4">
           <span className="text-slate-500">Total</span>
-          <span className="text-lg font-bold text-indigo-600">
+          <span className="text-lg font-bold text-green-700">
             {formatNaira(card.price)}
           </span>
         </div>
       </div>
 
-      <h3 className="mb-3 mt-8 font-semibold text-slate-900">Payment method</h3>
-      <div className="space-y-3">
-        {methods.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => setMethod(m.id)}
-            className={`flex w-full items-center gap-3 rounded-xl border bg-white p-4 text-left ${
-              method === m.id
-                ? "border-indigo-600 ring-2 ring-indigo-200"
-                : "border-slate-200"
-            }`}
-          >
-            <span className="text-xl">{m.icon}</span>
-            <span className="font-medium text-slate-900">{m.label}</span>
-          </button>
-        ))}
-      </div>
+      <p className="mt-6 text-sm text-slate-500">
+        You'll pay securely on Paystack with your card, bank transfer or USSD.
+        Your card details are shown here right after payment.
+      </p>
 
-      {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
       <button
         onClick={pay}
         disabled={loading}
-        className="mt-6 w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+        className="mt-6 w-full rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-60"
       >
-        {loading ? "Processing..." : `Pay ${formatNaira(card.price)}`}
+        {loading ? "Redirecting to Paystack..." : `Pay ${formatNaira(card.price)}`}
       </button>
     </>
   );

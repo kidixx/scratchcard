@@ -22,7 +22,7 @@ export default function BottomNav() {
               key={t.href}
               href={t.href}
               className={`flex flex-1 flex-col items-center py-3 text-xs font-medium ${
-                active ? "text-indigo-600" : "text-slate-400"
+                active ? "text-green-600" : "text-slate-400"
               }`}
             >
               <span className="text-xl">{t.icon}</span>

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
+  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -87,7 +87,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => setShow(!show)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-indigo-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600"
             >
               {show ? "Hide" : "Show"}
             </button>
@@ -98,7 +98,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-60"
           >
             {loading ? "Creating account..." : "Sign up"}
           </button>
@@ -106,7 +106,7 @@ export default function SignupPage() {
 
         <p className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-indigo-600">
+          <Link href="/login" className="font-semibold text-green-600">
             Log in
           </Link>
         </p>

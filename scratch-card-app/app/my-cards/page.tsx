@@ -43,7 +43,7 @@ export default function MyCardsPage() {
             </p>
             <Link
               href="/home"
-              className="mt-4 inline-block font-semibold text-indigo-600"
+              className="mt-4 inline-block font-semibold text-green-600"
             >
               Buy your first card
             </Link>
@@ -78,7 +78,7 @@ export default function MyCardsPage() {
                         })}
                       </p>
                     </div>
-                    <p className="whitespace-nowrap font-bold text-indigo-600">
+                    <p className="whitespace-nowrap font-bold text-green-600">
                       {formatNaira(p.price)}
                     </p>
                   </button>
@@ -96,7 +96,7 @@ export default function MyCardsPage() {
                             </p>
                             <button
                               onClick={() => copy(p.id + f.label, f.value)}
-                              className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600"
+                              className="rounded-lg bg-green-50 px-3 py-1.5 text-sm font-medium text-green-600"
                             >
                               {copied === p.id + f.label ? "Copied" : "Copy"}
                             </button>

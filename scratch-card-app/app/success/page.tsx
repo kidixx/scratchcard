@@ -37,7 +37,7 @@ function SuccessContent() {
         <p className="text-slate-600">We couldn't find that purchase.</p>
         <Link
           href="/my-cards"
-          className="mt-3 inline-block font-semibold text-indigo-600"
+          className="mt-3 inline-block font-semibold text-green-600"
         >
           Go to My Cards
         </Link>
@@ -74,7 +74,7 @@ function SuccessContent() {
               </p>
               <button
                 onClick={() => copy(f.label, f.value)}
-                className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600"
+                className="rounded-lg bg-green-50 px-3 py-1.5 text-sm font-medium text-green-600"
               >
                 {copied === f.label ? "Copied" : "Copy"}
               </button>
@@ -85,13 +85,13 @@ function SuccessContent() {
 
       <Link
         href="/my-cards"
-        className="mt-6 block w-full rounded-xl bg-indigo-600 py-3 text-center font-semibold text-white hover:bg-indigo-700"
+        className="mt-6 block w-full rounded-xl bg-green-600 py-3 text-center font-semibold text-white hover:bg-green-700"
       >
         View my cards
       </Link>
       <Link
         href="/home"
-        className="mt-3 block text-center text-sm font-medium text-indigo-600"
+        className="mt-3 block text-center text-sm font-medium text-green-600"
       >
         Back to home
       </Link>
